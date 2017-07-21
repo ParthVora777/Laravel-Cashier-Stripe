@@ -17,9 +17,9 @@
                                 <input id="name" type="text" class="form-control" name="name" value="{{ old('name') }}" required autofocus>
 
                                 @if ($errors->has('name'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('name') }}</strong>
-                                    </span>
+                                <span class="help-block">
+                                    <strong>{{ $errors->first('name') }}</strong>
+                                </span>
                                 @endif
                             </div>
                         </div>
@@ -31,9 +31,9 @@
                                 <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required>
 
                                 @if ($errors->has('email'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('email') }}</strong>
-                                    </span>
+                                <span class="help-block">
+                                    <strong>{{ $errors->first('email') }}</strong>
+                                </span>
                                 @endif
                             </div>
                         </div>
@@ -45,9 +45,9 @@
                                 <input id="password" type="password" class="form-control" name="password" required>
 
                                 @if ($errors->has('password'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('password') }}</strong>
-                                    </span>
+                                <span class="help-block">
+                                    <strong>{{ $errors->first('password') }}</strong>
+                                </span>
                                 @endif
                             </div>
                         </div>
@@ -65,11 +65,20 @@
 
                             <div class="col-md-6">
                                 <select id="subscription-plan" class="form-control" name="subscription_plan" required>
-                                    <option value="1">Daily ($1)</option>
-                                    <option value="2">Weekly ($7)</option>
+                                    <option value="daily">Daily ($1)</option>
+                                    <option value="weekly">Weekly ($7)</option>
                                 </select>
                             </div>
                         </div>
+
+                        <div class="form-group">
+                            <label for="card-no" class="col-md-4 control-label">Card no</label>
+
+                            <div class="col-md-6">
+                                <input id="card-no" type="text" class="form-control" name="card_no" value="{{ old('card_no') }}" required>
+                            </div>
+                        </div>
+
 
                         <div class="form-group">
                             <div class="col-md-6 col-md-offset-4">
