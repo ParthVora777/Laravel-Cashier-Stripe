@@ -15,14 +15,14 @@ class SubscriptionPlans extends Seeder
     	SubscriptionPlan::truncate();
 
         SubscriptionPlan::create([
-        	'stripe_id' => '1',
+        	'stripe_id' => 'daily',
         	'name' => 'Daily',
         	'description' => 'Daily plan',
         	'amount' => '100.00'
     	]);
 
     	SubscriptionPlan::create([
-        	'stripe_id' => '2',
+        	'stripe_id' => 'weekly',
         	'name' => 'Weekly',
         	'description' => 'Weekly plan',
         	'amount' => '700.00'
