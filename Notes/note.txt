@@ -1,0 +1,4 @@
+Pending:
+1) Twice email input
+2) User rollback ***
+3) Coupons ***

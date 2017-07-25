@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
+use DB;
 use App\User;
+use App\SubscriptionPlan;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 
@@ -51,7 +55,7 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
-        ]);
+            ]);
     }
 
     /**
@@ -62,11 +66,77 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        dd($data);
-        return User::create([
+        DB::beginTransaction();
+
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
-        ]);
+            ]);
+
+        $stripeToken = $data['stripeToken'];
+
+        try {
+            $subscriptionPlan = SubscriptionPlan::find(request('subscription-plan'));
+
+            $subscription = $user->newSubscription($subscriptionPlan->name, $subscriptionPlan->stripe_id);
+
+            if(isset($data['coupon'])) {
+                $subscription = $subscription->withCoupon($data['coupon']);
+            }
+
+            $subscription = $subscription->create($stripeToken);
+            DB::commit();
+        } catch(\Exception $e) {
+            DB::rollBack();
+            return ['stripe_errors' => $e->getMessage()];
+        }
+
+        return $user;
+    }
+
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showRegistrationForm()
+    {
+        if(empty(request('subscription-plan'))) {
+            return redirect()->route('subscriptions.index');
+        }
+        $subscriptionPlan = SubscriptionPlan::find(request('subscription-plan'));
+
+        return view('auth.register', compact('subscriptionPlan'));
+    }
+
+    /**
+     * Show the application subscription form.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function subscriptions()
+    {
+        return view('auth.subscriptions');
+    }
+
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function register(Request $request)
+    {
+        $this->validator($request->all())->validate();
+
+        event(new Registered($user = $this->create($request->all())));
+
+        if($user instanceof User) {
+            return $this->registered($request, $user)
+            ?: redirect($this->redirectPath());   
+        } else {
+            return back()->withErrors($user)->withInput();
+        }
     }
 }
